@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class ProgettoTest {
 
-    private Progetto progetto;
+    public Progetto progetto;
 
     @BeforeEach
     void setUp() {
