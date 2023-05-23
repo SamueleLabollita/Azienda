@@ -95,8 +95,14 @@ class Progetto {
         personale.add(membro);
     }
 
-    public List<Personale> getPersonale() {
-        return new ArrayList<>(personale);
+    public List<Personale> getPersonale(Predicate<Personale> filtro) {
+        List<Personale> personaleFiltrato = new ArrayList<>();
+        for (Personale membro : personale) {
+            if (filtro.test(membro)) {
+                personaleFiltrato.add(membro);
+            }
+        }
+        return personaleFiltrato;
     }
 
     public double getCostoComplessivo() {
@@ -127,5 +133,7 @@ class Progetto {
             throw new PersonaleNulloException();
         }
     }
+
+    
 }
 
