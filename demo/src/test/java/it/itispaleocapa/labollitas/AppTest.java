@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Unit test for simple App.
  */
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 class ProgettoTest {
 
     private Progetto progetto;
@@ -17,84 +21,71 @@ class ProgettoTest {
     }
 
     @Test
-    void aggiungiPersonaleSingoloMembro() {
-        Personale membro = new Tecnico("T001", "Labollita", "Samuele", 2018, "informatica-telecomunicazioni", true);
-        progetto.aggiungiPersonale(membro);
-        List<Personale> personale = progetto.getPersonale();
-        assertEquals(1, personale.size());
-        assertTrue(personale.contains(membro));
+    void testAggiungiPersonale() throws PersonaleNulloException {
+        Personale dirigente = new Dirigente("D1", "Rossi", "Mario", 2010);
+        progetto.aggiungiPersonale(dirigente);
+
+        Assertions.assertEquals(1, progetto.getPersonale().size());
+        Assertions.assertEquals(dirigente, progetto.getPersonale().get(0));
     }
 
     @Test
-    void aggiungiPersonaleNullMembro() {
-        assertThrows(IllegalArgumentException.class, () -> progetto.aggiungiPersonale(null));
+    void testAggiungiPersonale_NullPersonale() {
+        Assertions.assertThrows(PersonaleNulloException.class, () -> {
+            progetto.aggiungiPersonale(null);
+        });
     }
 
     @Test
-    void getCostoComplessivoNoPersonale() {
-        double costoComplessivo = progetto.getCostoComplessivo();
-        assertEquals(0, costoComplessivo);
-    }
+    void testGetCostoComplessivo() throws PersonaleNulloException {
+        Personale dirigente = new Dirigente("D1", "Rossi", "Mario", 2010);
+        Personale tecnico1 = new Tecnico("T1", "Verdi", "Luigi", 2015, "informatica-telecomunicazioni", true);
+        Personale tecnico2 = new Tecnico("T2", "Bianchi", "Giuseppe", 2018, "elettronica-automazione", false);
+        Personale funzionario1 = new Funzionario("F1", "Gialli", "Anna", 2012, 8);
+        Personale funzionario2 = new Funzionario("F2", "Neri", "Marco", 2010, 12);
 
-    @Test
-    void getCostoComplessivoSingleMember() {
-        Personale membro = new Tecnico("T001", "Labollita", "Samuele", 2018, "informatica-telecomunicazioni", true);
-        progetto.aggiungiPersonale(membro);
-        double costoComplessivo = progetto.getCostoComplessivo();
-        double expectedCosto = 40 + (2023 - 2018);
-        assertEquals(expectedCosto, costoComplessivo);
-    }
-
-    @Test
-    void getCostoComplessivoMultipleMembers() {
-        Personale tecnico1 = new Tecnico("T001", "Labollita", "Samuele", 2018, "informatica-telecomunicazioni", true);
-        Personale tecnico2 = new Tecnico("T002", "Verdi", "Luca", 2019, "elettronica-automazione", false);
-        Personale funzionario1 = new Funzionario("F001", "Bianchi", "Anna", 2015, 8);
+        progetto.aggiungiPersonale(dirigente);
         progetto.aggiungiPersonale(tecnico1);
         progetto.aggiungiPersonale(tecnico2);
         progetto.aggiungiPersonale(funzionario1);
-        double costoComplessivo = progetto.getCostoComplessivo();
-        double expectedCosto = 40 + (2023 - 2018) + 50 + 70;
-        assertEquals(expectedCosto, costoComplessivo);
+        progetto.aggiungiPersonale(funzionario2);
+
+        double costoComplessivo = 100 + 40 + 50 + 70 + 80;
+        Assertions.assertEquals(costoComplessivo, progetto.getCostoComplessivo());
     }
 
     @Test
-    void calcolaCostoOrarioTecnicoInformaticaInterno() {
-        Tecnico tecnico = new Tecnico("T001", "Labollita", "Samuele", 2018, "informatica-telecomunicazioni", true);
-        double costoOrario = progetto.calcolaCostoOrario(tecnico);
-        double expectedCosto = 40 + (2023 - 2018);
-        assertEquals(expectedCosto, costoOrario);
+    void testCalcolaCostoOrario_TecnicoInternoInformaticaTelecomunicazioni() {
+        Tecnico tecnico = new Tecnico("T1", "Verdi", "Luigi", 2015, "informatica-telecomunicazioni", true);
+        double costoOrario = 40 + (2023 - 2015);
+        Assertions.assertEquals(costoOrario, progetto.calcolaCostoOrario(tecnico));
     }
 
     @Test
-    void calcolaCostoOrarioTecnicoElettronicaEsterno() {
-        Tecnico tecnico = new Tecnico("T001", "Labollita", "Samuele", 2019, "elettronica-automazione", false);
-        double costoOrario = progetto.calcolaCostoOrario(tecnico);
-        double expectedCosto = 50;
-        assertEquals(expectedCosto, costoOrario);
+    void testCalcolaCostoOrario_TecnicoEsternoElettronicaAutomazione() {
+        Tecnico tecnico = new Tecnico("T1", "Verdi", "Luigi", 2018, "elettronica-automazione", false);
+        double costoOrario = 50;
+        Assertions.assertEquals(costoOrario, progetto.calcolaCostoOrario(tecnico));
     }
 
     @Test
-    void calcolaCostoOrarioFunzionarioJunior() {
-        Funzionario funzionario = new Funzionario("F001", "Bianchi", "Anna", 2015, 7);
-        double costoOrario = progetto.calcolaCostoOrario(funzionario);
-        double expectedCosto = 70;
-        assertEquals(expectedCosto, costoOrario);
+    void testCalcolaCostoOrario_FunzionarioJunior() {
+        Funzionario funzionario = new Funzionario("F1", "Gialli", "Anna", 2012, 5);
+        double costoOrario = 70;
+        Assertions.assertEquals(costoOrario, progetto.calcolaCostoOrario(funzionario));
     }
 
     @Test
-    void calcolaCostoOrarioFunzionarioSenior() {
-        Funzionario funzionario = new Funzionario("F001", "Bianchi", "Anna", 2008, 12);
-        double costoOrario = progetto.calcolaCostoOrario(funzionario);
-        double expectedCosto = 80;
-        assertEquals(expectedCosto, costoOrario);
+    void testCalcolaCostoOrario_FunzionarioSenior() {
+        Funzionario funzionario = new Funzionario("F1", "Gialli", "Anna", 2010, 12);
+        double costoOrario = 80;
+        Assertions.assertEquals(costoOrario, progetto.calcolaCostoOrario(funzionario));
     }
 
     @Test
-    void calcolaCostoOrarioDirigente() {
-        Dirigente dirigente = new Dirigente("D001", "Gialli", "Giuseppe", 2005);
-        double costoOrario = progetto.calcolaCostoOrario(dirigente);
-        double expectedCosto = 100;
-        assertEquals(expectedCosto, costoOrario);
+    void testCalcolaCostoOrario_Dirigente() {
+        Dirigente dirigente = new Dirigente("D1", "Rossi", "Mario", 2010);
+        double costoOrario = 100;
+        Assertions.assertEquals(costoOrario, progetto.calcolaCostoOrario(dirigente));
     }
 }

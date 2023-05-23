@@ -7,11 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+class PersonaleNulloException extends IllegalArgumentException {
+    
+}
+
 class Personale {
-    private String id;
-    private String cognome;
-    private String nome;
-    private int annoAssunzione;
+    public String id;
+    public String cognome;
+    public String nome;
+    public int annoAssunzione;
 
     public Personale(String id, String cognome, String nome, int annoAssunzione) {
         this.id = id;
@@ -38,8 +42,8 @@ class Personale {
 }
 
 class Tecnico extends Personale {
-    private String areaCompetenza;
-    private boolean interno;
+    public String areaCompetenza;
+    public boolean interno;
 
     public Tecnico(String id, String cognome, String nome, int annoAssunzione, String areaCompetenza, boolean interno) {
         super(id, cognome, nome, annoAssunzione);
@@ -57,7 +61,7 @@ class Tecnico extends Personale {
 }
 
 class Funzionario extends Personale {
-    private int anniEsperienza;
+    public int anniEsperienza;
 
     public Funzionario(String id, String cognome, String nome, int annoAssunzione, int anniEsperienza) {
         super(id, cognome, nome, annoAssunzione);
@@ -75,18 +79,24 @@ class Dirigente extends Personale {
     }
 }
 
+
+
 class Progetto {
-    private List<Personale> personale;
+    public List<Personale> personale;
 
     public Progetto() {
         personale = new ArrayList<>();
     }
 
-    public void aggiungiPersonale(Personale membro) throws personaleNulloException{
+    public void aggiungiPersonale(Personale membro) throws PersonaleNulloException {
         if (membro == null) {
-            throw personaleNulloException;
+            throw new PersonaleNulloException();
         }
         personale.add(membro);
+    }
+
+    public List<Personale> getPersonale() {
+        return new ArrayList<>(personale);
     }
 
     public double getCostoComplessivo() {
@@ -97,10 +107,10 @@ class Progetto {
         return costoComplessivo;
     }
 
-    public double calcolaCostoOrario(Personale membro) throws personaleNulloException{
+    public double calcolaCostoOrario(Personale membro) throws PersonaleNulloException{
         if (membro instanceof Tecnico) {
             Tecnico tecnico = (Tecnico) membro;
-            double costoBase = tecnico.getAreaCompetenza().equals("informatica-telecomunicazioni") ? 40 : 50; //CONDIZIONE VERA : CONDIZIONE FALSA (TEC INF : TEC ELE)
+            double costoBase = tecnico.getAreaCompetenza().equals("informatica-telecomunicazioni") ? 40 : 50;
             double costoOrario = costoBase;
             if (tecnico.isInterno()) {
                 int anniTrascorsi = 2023 - tecnico.getAnnoAssunzione();
@@ -113,12 +123,9 @@ class Progetto {
             return costoOrario;
         } else if (membro instanceof Dirigente) {
             return 100;
-        } else 
-            throw personaleNulloException; 
+        } else {
+            throw new PersonaleNulloException();
+        }
     }
 }
-class personaleNulloException extends Exception{
-
-}
-
 
